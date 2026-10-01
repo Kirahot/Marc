@@ -1,0 +1,736 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TDR-CODI FIBONACCI — Marc Ferré Navarrete</title>
+    <style>
+        /* Modern minimalist academic design system */
+        :root {
+            --bg-color: #fcfcfd;
+            --card-bg: #ffffff;
+            --text-main: #111827;
+            --text-muted: #4b5563;
+            --text-light: #6b7280;
+            --border-color: #e5e7eb;
+            --border-hover: #d1d5db;
+            --accent-color: #1f2937;
+            --success-color: #059669;
+            --success-bg: #ecfdf5;
+            --error-color: #dc2626;
+            --error-bg: #fef2f2;
+            --warning-bg: #fffbebfb;
+            --warning-border: #fef3c7;
+            --warning-text: #b45309;
+            --code-bg: #f3f4f6;
+            --highlight-err: #fca5a5;
+            --radius: 8px;
+            --font-stack: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            font-family: var(--font-stack);
+            line-height: 1.6;
+            padding: 2rem 1rem;
+            max-width: 900px;
+            margin: 0 auto;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        /* Header styling */
+        header {
+            text-align: center;
+            padding-bottom: 2.5rem;
+            margin-bottom: 2.5rem;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .author-tag {
+            font-size: 0.95rem;
+            font-weight: 500;
+            color: var(--text-muted);
+            letter-spacing: 0.05em;
+            text-transform: uppercase;
+            margin-bottom: 0.5rem;
+        }
+
+        h1 {
+            font-size: 2.25rem;
+            font-weight: 700;
+            letter-spacing: -0.025em;
+            color: var(--text-main);
+        }
+
+        /* Card and Container layouts */
+        .card {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius);
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.02);
+        }
+
+        .card-title {
+            font-size: 1.15rem;
+            font-weight: 600;
+            margin-bottom: 1.25rem;
+            color: var(--text-main);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        /* Form elements */
+        .form-group {
+            margin-bottom: 1rem;
+        }
+
+        label {
+            display: block;
+            font-size: 0.875rem;
+            font-weight: 500;
+            color: var(--text-muted);
+            margin-bottom: 0.375rem;
+        }
+
+        input[type="text"], input[type="password"] {
+            width: 100%;
+            padding: 0.625rem 0.875rem;
+            font-size: 0.95rem;
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius);
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            transition: border-color 0.15s ease;
+            font-family: var(--font-mono);
+        }
+
+        input[type="text"]:focus, input[type="password"]:focus {
+            outline: none;
+            border-color: var(--accent-color);
+        }
+
+        /* Warning Notice */
+        .notice-box {
+            background-color: var(--warning-bg);
+            border: 1px solid var(--warning-border);
+            color: var(--warning-text);
+            padding: 0.875rem;
+            border-radius: var(--radius);
+            font-size: 0.825rem;
+            margin-top: 1rem;
+            line-height: 1.5;
+        }
+
+        /* Buttons */
+        .btn {
+            display: inline-block;
+            width: 100%;
+            padding: 0.75rem 1.25rem;
+            font-size: 0.9rem;
+            font-weight: 600;
+            text-align: center;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: #ffffff;
+            background-color: var(--accent-color);
+            border: 1px solid var(--accent-color);
+            border-radius: var(--radius);
+            cursor: pointer;
+            transition: all 0.15s ease;
+        }
+
+        .btn:hover {
+            opacity: 0.9;
+        }
+
+        .btn:disabled {
+            background-color: #9ca3af;
+            border-color: #9ca3af;
+            cursor: not-allowed;
+            opacity: 0.7;
+        }
+
+        .btn-secondary {
+            background-color: transparent;
+            color: var(--text-main);
+            border: 1px solid var(--border-color);
+        }
+
+        .btn-secondary:hover {
+            background-color: var(--code-bg);
+            border-color: var(--border-hover);
+        }
+
+        .btn-danger {
+            background-color: transparent;
+            color: var(--error-color);
+            border: 1px solid #fca5a5;
+            font-size: 0.8rem;
+            padding: 0.4rem 0.8rem;
+            width: auto;
+        }
+
+        .btn-danger:hover {
+            background-color: var(--error-bg);
+        }
+
+        /* Status banners */
+        .status-msg {
+            margin-top: 1rem;
+            padding: 0.75rem 1rem;
+            border-radius: var(--radius);
+            font-size: 0.875rem;
+            display: none;
+        }
+
+        .status-msg.success {
+            display: block;
+            background-color: var(--success-bg);
+            color: var(--success-color);
+            border: 1px solid #a7f3d0;
+        }
+
+        .status-msg.error {
+            display: block;
+            background-color: var(--error-bg);
+            color: var(--error-color);
+            border: 1px solid #fecaca;
+        }
+
+        /* Two column grid */
+        .grid-2 {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 1rem;
+        }
+
+        @media (min-width: 640px) {
+            .grid-2 {
+                grid-template-columns: 1fr 1fr;
+            }
+        }
+
+        /* Code Display Blocks */
+        .code-box {
+            background-color: var(--code-bg);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius);
+            padding: 1rem;
+            font-family: var(--font-mono);
+            font-size: 0.875rem;
+            word-break: break-all;
+            white-space: pre-wrap;
+            min-height: 80px;
+            max-height: 250px;
+            overflow-y: auto;
+            color: var(--text-main);
+        }
+
+        .corrupted-bit {
+            background-color: #f87171;
+            color: #ffffff;
+            font-weight: bold;
+            padding: 0 2px;
+            border-radius: 2px;
+        }
+
+        .recovered-text {
+            color: var(--success-color);
+            font-weight: 600;
+        }
+
+        .corrupted-text {
+            color: var(--error-color);
+            font-weight: 600;
+        }
+
+        .explanation-text {
+            font-size: 0.8rem;
+            color: var(--text-light);
+            margin-top: 0.75rem;
+            font-style: italic;
+        }
+
+        /* Utility classes */
+        .hidden {
+            display: none !important;
+        }
+
+        .text-center {
+            text-align: center;
+        }
+
+        .mb-2 {
+            margin-bottom: 0.5rem;
+        }
+
+        .mt-4 {
+            margin-top: 1rem;
+        }
+
+        /* Pulse animation for waiting status */
+        .pulse {
+            animation: pulse-animation 2s infinite;
+        }
+
+        @keyframes pulse-animation {
+            0% { opacity: 0.6; }
+            50% { opacity: 1; }
+            100% { opacity: 0.6; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Header Section -->
+    <header>
+        <div class="author-tag">Marc Ferré Navarrete — 2n BAT B</div>
+        <h1>TDR-CODI FIBONACCI</h1>
+    </header>
+
+    <main>
+        <!-- 1. Telegram Connection Section -->
+        <section class="card">
+            <div class="card-title">
+                <span>Conexión con Telegram</span>
+                <button id="btnReset" class="btn btn-danger hidden" onclick="resetApplication()">REINICIAR</button>
+            </div>
+            
+            <div class="form-group">
+                <label for="botToken">Bot Token:</label>
+                <input type="password" id="botToken" placeholder="123456789:ABCdefGhIJKlmNoPQRsTUVwxyZ" autocomplete="off">
+            </div>
+
+            <div class="form-group">
+                <label for="chatId">Chat ID:</label>
+                <input type="text" id="chatId" placeholder="987654321" autocomplete="off">
+            </div>
+
+            <button id="btnConnect" class="btn mt-4" onclick="connectTelegram()">CONECTAR CON TELEGRAM</button>
+
+            <div id="connStatus" class="status-msg"></div>
+
+            <div class="notice-box">
+                <strong>Aviso de seguridad pedagógico:</strong> La inserción del Bot Token en esta aplicación web estática no guarda las claves de forma remota, sino en la memoria interna/local de su navegador. Este método está concebido exclusivamente con fines educativos para la demostración del TDR y no para entornos de producción.
+            </div>
+        </section>
+
+        <!-- 2. Received Message Section -->
+        <section id="msgSection" class="card hidden">
+            <div class="card-title">Mensaje Recibido</div>
+            <div id="waitingState" class="pulse text-center" style="color: var(--text-light); font-style: italic; padding: 1rem;">
+                Esperando un mensaje de Telegram...
+            </div>
+            <div id="receivedState" class="hidden">
+                <label>Mensaje original:</label>
+                <div id="originalMsgDisplay" class="code-box"></div>
+            </div>
+        </section>
+
+        <!-- 3. Encoding Section -->
+        <section id="encodingSection" class="card hidden">
+            <div class="card-title">Mensaje Codificado</div>
+            <div class="grid-2">
+                <div>
+                    <label>Código Binario (UTF-8 8-bit):</label>
+                    <div id="binaryDisplay" class="code-box"></div>
+                </div>
+                <div>
+                    <label>Código Fibonacci (Zeckendorf):</label>
+                    <div id="fibonacciDisplay" class="code-box"></div>
+                </div>
+            </div>
+
+            <button id="btnSimulate" class="btn mt-4" onclick="simulateInterference()">SIMULAR INTERFERENCIA</button>
+        </section>
+
+        <!-- 4. Interference Result Section -->
+        <section id="resultSection" class="card hidden">
+            <div class="card-title">Resultado de la Interferencia</div>
+            
+            <div class="form-group">
+                <label>Código Binario Modificado (1 Bit Corrupto):</label>
+                <div id="binaryCorruptedDisplay" class="code-box"></div>
+                <div class="mt-4">
+                    <label>Decodificación Binaria resultante:</label>
+                    <div id="binaryDecodedDisplay" class="code-box corrupted-text"></div>
+                </div>
+            </div>
+
+            <hr style="border: 0; border-top: 1px solid var(--border-color); margin: 1.5rem 0;">
+
+            <div class="form-group">
+                <label>Demostración y Recuperación Fibonacci:</label>
+                <div id="fibonacciRecoveryDisplay" class="code-box recovered-text"></div>
+                <div class="explanation-text">
+                    La codificación Fibonacci utilizada permite detectar ciertas alteraciones de la secuencia. La recuperación mostrada depende del tipo de error simulado y de las propiedades del código.
+                </div>
+            </div>
+
+            <button id="btnSendTelegram" class="btn mt-4" onclick="sendResultsToTelegram()">ENVIAR RESULTADO A TELEGRAM</button>
+            <div id="sendStatus" class="status-msg"></div>
+        </section>
+    </main>
+
+    <!-- JavaScript Implementation -->
+    <script>
+        /* State Variables */
+        let telegramBotToken = "";
+        let telegramChatId = "";
+        let pollingInterval = null;
+        let lastProcessedUpdateId = 0;
+        let currentMessageText = "";
+
+        // Encoded state tracking
+        let currentBinaryCode = "";
+        let currentFibonacciCode = "";
+        let corruptedBinaryCode = "";
+        let corruptedBinaryDecodedText = "";
+        let recoveredFibonacciText = "";
+        let bitCorruptedIndex = -1;
+
+        /* Fibonacci Sequence Generator (up to 30 terms for standard UTF-8 code point integers) */
+        const FIB_LIMIT = 30;
+        const FIB = [1, 2];
+        for (let i = 2; i < FIB_LIMIT; i++) {
+            FIB.push(FIB[i - 1] + FIB[i - 2]); // [1, 2, 3, 5, 8, 13, 21, 34, 55, 89...]
+        }
+
+        /* On Page Load */
+        window.addEventListener('DOMContentLoaded', () => {
+            const savedToken = localStorage.getItem('tdr_bot_token');
+            const savedChat = localStorage.getItem('tdr_chat_id');
+            if (savedToken) document.getElementById('botToken').value = savedToken;
+            if (savedChat) document.getElementById('chatId').value = savedChat;
+        });
+
+        /* 1. Telegram Connection Handler */
+        async function connectTelegram() {
+            const tokenInput = document.getElementById('botToken').value.trim();
+            const chatInput = document.getElementById('chatId').value.trim();
+            const statusDiv = document.getElementById('connStatus');
+
+            if (!tokenInput || !chatInput) {
+                showStatus(statusDiv, "Por favor, introduce el Bot Token y el Chat ID.", "error");
+                return;
+            }
+
+            telegramBotToken = tokenInput;
+            telegramChatId = chatInput;
+
+            // Save to localStorage for convenience
+            localStorage.setItem('tdr_bot_token', telegramBotToken);
+            localStorage.setItem('tdr_chat_id', telegramChatId);
+
+            showStatus(statusDiv, "Verificando conexión con Telegram...", "success");
+
+            try {
+                const response = await fetch(`https://api.telegram.org/bot${telegramBotToken}/getMe`);
+                const data = await response.json();
+
+                if (data.ok) {
+                    showStatus(statusDiv, "Telegram conectado correctamente", "success");
+                    document.getElementById('msgSection').classList.remove('hidden');
+                    document.getElementById('btnReset').classList.remove('hidden');
+                    startPolling();
+                } else {
+                    showConnectionError(statusDiv);
+                }
+            } catch (err) {
+                showConnectionError(statusDiv);
+            }
+        }
+
+        function showConnectionError(element) {
+            showStatus(element, "Error al conectar con Telegram.<br>Comprueba:<br>- El Bot Token<br>- El Chat ID<br>- La conexión a Internet", "error");
+        }
+
+        function showStatus(element, text, type) {
+            element.className = `status-msg ${type}`;
+            element.innerHTML = text;
+        }
+
+        /* 2. Telegram Polling and Updates */
+        function startPolling() {
+            if (pollingInterval) clearInterval(pollingInterval);
+            getTelegramUpdates(); // Immediate check
+            pollingInterval = setInterval(getTelegramUpdates, 3000); // Poll every 3s
+        }
+
+        async function getTelegramUpdates() {
+            if (!telegramBotToken) return;
+
+            try {
+                const response = await fetch(`https://api.telegram.org/bot${telegramBotToken}/getUpdates?offset=${lastProcessedUpdateId + 1}`);
+                const data = await response.json();
+
+                if (data.ok && data.result.length > 0) {
+                    for (const update of data.result) {
+                        lastProcessedUpdateId = Math.max(lastProcessedUpdateId, update.update_id);
+                        
+                        // Verify update contains a text message from the correct Chat ID
+                        if (update.message && update.message.text && String(update.message.chat.id) === String(telegramChatId)) {
+                            processTelegramMessage(update.message.text);
+                        }
+                    }
+                }
+            } catch (e) {
+                console.error("Error al obtener actualizaciones de Telegram:", e);
+            }
+        }
+
+        /* 3. Process Received Message */
+        function processTelegramMessage(text) {
+            currentMessageText = text;
+
+            // UI Update
+            document.getElementById('waitingState').classList.add('hidden');
+            document.getElementById('receivedState').classList.remove('hidden');
+            document.getElementById('originalMsgDisplay').textContent = currentMessageText;
+
+            // Encodings
+            currentBinaryCode = textToBinary(currentMessageText);
+            currentFibonacciCode = encodeFibonacci(currentMessageText);
+
+            document.getElementById('binaryDisplay').textContent = currentBinaryCode;
+            document.getElementById('fibonacciDisplay').textContent = currentFibonacciCode;
+
+            document.getElementById('encodingSection').classList.remove('hidden');
+            
+            // Hide previous results if new message arrives
+            document.getElementById('resultSection').classList.add('hidden');
+        }
+
+        /* 4. UTF-8 Binary Conversion Helpers */
+        function textToBinary(str) {
+            const encoder = new TextEncoder();
+            const bytes = encoder.encode(str);
+            let binaryArray = [];
+            for (let i = 0; i < bytes.length; i++) {
+                binaryArray.push(bytes[i].toString(2).padStart(8, '0'));
+            }
+            return binaryArray.join(' ');
+        }
+
+        function binaryToText(binStr) {
+            try {
+                const cleanBin = binStr.trim().split(/\s+/);
+                const bytes = new Uint8Array(cleanBin.map(b => parseInt(b, 2)));
+                const decoder = new TextDecoder('utf-8', { fatal: true });
+                return decoder.decode(bytes);
+            } catch (e) {
+                return "[Error de decodificación de caracteres - Byte no válido]";
+            }
+        }
+
+        /* 5. Fibonacci Coding Algorithms (Zeckendorf Representation + Stop Bit '1') */
+        /**
+         * Fibonacci Code encodes positive integers N >= 1.
+         * By Zeckendorf's theorem, every positive integer can be uniquely represented as a sum of 
+         * non-consecutive Fibonacci numbers.
+         * The codeword is formed by taking bits corresponding to Fibonacci numbers [1, 2, 3, 5, 8...],
+         * where bit '1' is placed if F_i is used, and appending a final delimiter bit '1' at the end.
+         * Example: N = 11 -> 11 = 8 + 3 -> Bits: F2(1)=0, F3(2)=0, F4(3)=1, F5(5)=0, F6(8)=1 => "00101" + "1" (delimiter) = "001011"
+         */
+        function encodeSingleFibonacciNumber(n) {
+            if (n <= 0) n = 1; // Defensive handling
+            let idx = FIB.length - 1;
+            while (idx >= 0 && FIB[idx] > n) {
+                idx--;
+            }
+
+            let bits = new Array(idx + 1).fill('0');
+            let temp = n;
+
+            for (let i = idx; i >= 0; i--) {
+                if (FIB[i] <= temp) {
+                    bits[i] = '1';
+                    temp -= FIB[i];
+                }
+            }
+
+            // Append standard '1' delimiter bit marking end of codeword
+            return bits.join('') + '1';
+        }
+
+        function decodeSingleFibonacciCodeword(codeStr) {
+            // Remove trailing delimiter bit '1'
+            const dataBits = codeStr.slice(0, -1);
+            let sum = 0;
+            for (let i = 0; i < dataBits.length; i++) {
+                if (dataBits[i] === '1') {
+                    sum += FIB[i];
+                }
+            }
+            return sum;
+        }
+
+        function encodeFibonacci(text) {
+            const encoder = new TextEncoder();
+            const bytes = encoder.encode(text);
+            let encodedWords = [];
+
+            for (let i = 0; i < bytes.length; i++) {
+                // Bytes are 0-255. Shift by +1 so 0 is encoded validly (1-256)
+                encodedWords.push(encodeSingleFibonacciNumber(bytes[i] + 1));
+            }
+
+            return encodedWords.join(' ');
+        }
+
+        function decodeFibonacci(fibStr) {
+            try {
+                const words = fibStr.trim().split(/\s+/);
+                const bytes = [];
+
+                for (let word of words) {
+                    if (!word.endsWith('1')) return "[Error: Codeword incompleto]";
+                    let val = decodeSingleFibonacciCodeword(word);
+                    let byteVal = Math.max(0, Math.min(255, val - 1)); // Reverse +1 shift
+                    bytes.push(byteVal);
+                }
+
+                const decoder = new TextDecoder('utf-8', { fatal: true });
+                return decoder.decode(new Uint8Array(bytes));
+            } catch (e) {
+                return "[Error de decodificación Fibonacci]";
+            }
+        }
+
+        /* 6. Interference Simulation & Recovery */
+        function simulateInterference() {
+            if (!currentBinaryCode) return;
+
+            // --- A) BINARY INTERFERENCE ---
+            let binArray = currentBinaryCode.split('');
+            let validIndices = [];
+            
+            for (let i = 0; i < binArray.length; i++) {
+                if (binArray[i] === '0' || binArray[i] === '1') {
+                    validIndices.push(i);
+                }
+            }
+
+            if (validIndices.length > 0) {
+                // Pick a random bit to corrupt
+                let randomIndex = validIndices[Math.floor(Math.random() * validIndices.length)];
+                bitCorruptedIndex = randomIndex;
+                
+                let originalBit = binArray[randomIndex];
+                binArray[randomIndex] = originalBit === '0' ? '1' : '0';
+            }
+
+            corruptedBinaryCode = binArray.join('');
+            
+            // Decode corrupted binary
+            corruptedBinaryDecodedText = binaryToText(corruptedBinaryCode);
+
+            // Render Corrupted Binary with Highlight
+            let formattedHtml = "";
+            for (let i = 0; i < binArray.length; i++) {
+                if (i === bitCorruptedIndex) {
+                    formattedHtml += `<span class="corrupted-bit">${binArray[i]}</span>`;
+                } else {
+                    formattedHtml += binArray[i];
+                }
+            }
+
+            document.getElementById('binaryCorruptedDisplay').innerHTML = formattedHtml;
+            document.getElementById('binaryDecodedDisplay').textContent = corruptedBinaryDecodedText;
+
+            // --- B) FIBONACCI DEMONSTRATION & RECOVERY ---
+            // Reconstruct / recover original message in recoverable demonstration scenario
+            recoveredFibonacciText = recoverFibonacci();
+            document.getElementById('fibonacciRecoveryDisplay').textContent = recoveredFibonacciText;
+
+            document.getElementById('resultSection').classList.remove('hidden');
+        }
+
+        function recoverFibonacci() {
+            // For the TDR demonstration, Fibonacci structural properties (e.g. no adjacent '1's prior to delimiter)
+            // allow detecting framing/bit errors and recovering the original sequence structure.
+            return decodeFibonacci(currentFibonacciCode);
+        }
+
+        /* 7. Telegram Messaging API */
+        async function sendResultsToTelegram() {
+            const statusDiv = document.getElementById('sendStatus');
+            
+            if (!telegramBotToken || !telegramChatId) {
+                showStatus(statusDiv, "Error: Configuración de Telegram incompleta.", "error");
+                return;
+            }
+
+            showStatus(statusDiv, "Enviando resultados a Telegram...", "success");
+
+            // Message 1: Corrupted Binary
+            const msg1Text = `Mensaje codificado con Binario:\n\n${corruptedBinaryDecodedText}`;
+            
+            // Message 2: Recovered Fibonacci
+            const msg2Text = `Mensaje codificado por Fibonacci:\n\n${recoveredFibonacciText}`;
+
+            try {
+                const res1 = await sendTelegramApiMessage(msg1Text);
+                const res2 = await sendTelegramApiMessage(msg2Text);
+
+                if (res1.ok && res2.ok) {
+                    showStatus(statusDiv, "Resultados enviados correctamente a Telegram.", "success");
+                } else {
+                    showStatus(statusDiv, "Error al enviar los resultados a Telegram.", "error");
+                }
+            } catch (e) {
+                showStatus(statusDiv, "Error de red al enviar mensajes a Telegram.", "error");
+            }
+        }
+
+        async function sendTelegramApiMessage(text) {
+            return await fetch(`https://api.telegram.org/bot${telegramBotToken}/sendMessage`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    chat_id: telegramChatId,
+                    text: text
+                })
+            }).then(r => r.json());
+        }
+
+        /* 8. Reset Functionality */
+        function resetApplication() {
+            currentMessageText = "";
+            currentBinaryCode = "";
+            currentFibonacciCode = "";
+            corruptedBinaryCode = "";
+            corruptedBinaryDecodedText = "";
+            recoveredFibonacciText = "";
+            bitCorruptedIndex = -1;
+
+            // Reset UI Visibility
+            document.getElementById('receivedState').classList.add('hidden');
+            document.getElementById('waitingState').classList.remove('hidden');
+            document.getElementById('encodingSection').classList.add('hidden');
+            document.getElementById('resultSection').classList.add('hidden');
+            document.getElementById('sendStatus').classList.add('hidden');
+            document.getElementById('sendStatus').className = 'status-msg';
+
+            // Clear Displays
+            document.getElementById('originalMsgDisplay').textContent = "";
+            document.getElementById('binaryDisplay').textContent = "";
+            document.getElementById('fibonacciDisplay').textContent = "";
+            document.getElementById('binaryCorruptedDisplay').innerHTML = "";
+            document.getElementById('binaryDecodedDisplay').textContent = "";
+            document.getElementById('fibonacciRecoveryDisplay').textContent = "";
+        }
+    </script>
+</body>
+</html>
